@@ -10,12 +10,12 @@ VALUES
 INSERT INTO role (title, salary, department_id)
 VALUES
 ('Agent', 85000, 1),
-('Lead Agent', 100000, 1)
+('Lead Agent', 100000, 1),
 ('Spy', 95999, 2),
 ('Consultant', 100000000, 3),
-('Avenger', 35000, 5)
+('Avenger', 35000, 5),
 ('Hero', 100, 4),
-('Off-world Hero', 0, 4)
+('Off-world Hero', 0, 4),
 ('Director', 250000, 6); 
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
