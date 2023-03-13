@@ -125,7 +125,7 @@ showRoles = () => {
     if (err) throw err;
     console.table(rows);
     promptUser();
-    });
+  });
 };
 
 // Create function to showEmployees
@@ -137,18 +137,105 @@ showEmployees = () => {
     LEFT JOIN department ON role.department_id = department.id
     LEFT JOIN employee manager ON employee.manager_if = manager.id`;
 
-    db.promise().query(sql, (err, rows) => {
-      if (err) throw err;
-      console.table(rows);
-      promptUser();
-      });
+  db.promise().query(sql, (err, rows) => {
+    if (err) throw err;
+    console.table(rows);
+    promptUser();
+  });
 };
 
 // Create function to addDepartment
+addDepartment = () => {
+  inquirer.prompt([
+    {
+      name: 'addDept',
+      type: 'input',
+      message: "What department would you like to add?",
+      validate: addDept => {
+        if (addDept) {
+          return true;
+        } else {
+          console.log("Please enter a department.");
+          return false;
+        }
+      }
+    }
+  ])
+    .then(answer => {
+      const sql = `INSERT INTO department (name) VALUES (?)`;
+      connection.query(sql, answer.addDept, (err, result => {
+        if (err) throw err;
+        console.log(answer.addDept + 'has been added to departments!');
 
+        showDepartments();
+      }));
+    });
+};
 
 // Create function to addRole
+addRole = () => {
+  inquirer.prompt([
+    {
+      name: 'role',
+      type: 'input',
+      message: "What role would you like to add?",
+      validate: addRole => {
+        if (addRole) {
+          return true;
+        } else {
+          console.log("Please enter a role.");
+          return false;
+        }
+      }
+    },
+    {
+      name: 'salary',
+      type: 'input',
+      message: "Please input the salary for this role.",
+      validate: addSalary => {
+        if (isNaN(addSalary)) {
+          return true;
+        } else {
+          console.log("Please enter a salary.");
+          return false;
+        }
+      }
+    }
+  ])
+    .then(answer => {
+      const params = [answer.role, answer.salary];
 
+      const roleSql = `SELECT name, id FROM department`;
+
+      connection.promise().query(roleSql, (err, data) => {
+        if (err) throw err;
+
+        const dept = data.map(({ name, id }) => ({ name: name, value: id }));
+
+        inquirer.prompt([
+          {
+            name: 'dept',
+            type: 'list',
+            message: "What department has this role?",
+            choices: dept
+          }
+        ])
+          .then(deptChoice => {
+            const dept = deptChoice.dept;
+            params.push(dept);
+
+            const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
+
+            connection.query(sql, params, (err, results) => {
+              if (err) throw err;
+              console.log(answer.role + "has been added to roles!");
+
+              showRoles();
+            });
+          });
+      });
+    });
+};
 
 // Create function to addEmployee
 
